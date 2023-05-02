@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>CarbonIntensityApp_CW3_TANG</title>
+  <script type="text/javascript" src="./jquery-3.6.4.min.js"></script>
+  <style>
+    #container {
+      margin: 0 auto;
+      font-family: Helvetica;
+      line-height: 1.4em;
+    }
+
+
+    #summary {
+      font-style: italic;
+    }
+
+
+  </style>
+
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <link href="assets/css/variables.css" rel="stylesheet">
+
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top" data-scrollto-offset="0">
+    <div class="container-fluid d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center scrollto me-auto me-lg-0">
+
+        <h1>Carbon Intensity Monitor<span>.</span></h1>
+      </a>
+    </div>
+
+  </header><!-- End Header -->
+
+
+
+<style>
+/*
+#tbody-search td{
+	color:var(--color-secondary-light);
+}
+*/
+</style>
+<section id="services" class="services">
+    <div class="container" data-aos="fade-up">
+
+        <div class="section-header">
+          <h2>Welcome !</h2>
+          <p>This website allows users to check the carbon intensity in different regions and time periods, and obtain the next best time for charging. </p>
+        </div>
+        <div>
+          &nbsp
+            <h2 style="font-size: 48px;font-weight: 300;margin-bottom: 20px;color: var(--color-secondary);">The main functions include 3 modules:</h2>
+            <p>
+            <ul>
+              <li>Map: displays the carbon intensity in different regions of the UK.</li>
+              <li>Search: allows users to enter a postcode and search for carbon intensity within 24 hours or beyond 24 hours, and recommends the 3 best hours for charging in the future.</li>
+              <li>Factor: shows the different contributing factors to current carbon intensity.</li>
+            </ul>
+            </p>
+          </div>
+         <!-- ======= API Section ======= -->
+		<div class="row">
+
+			<div class="btn-group" style="display:block;">
+				<a href="javascript:;" class="btntab btn btn-outline-primary">Map</a>
+				<a href="javascript:;" class="btntab btn btn-outline-secondary">Search</a>
+				<a href="javascript:;" class="btntab btn btn-outline-secondary">Factor</a>
+			</div>
+
+			<div class="row">
+
+				<div class="carbonshow"  style="height: 100%; margin: 0" >
+					<div id="tbody-map" style="height: 500px;"> </div>
+				</div>
+
+
+				<div class="carbonshow"  style="height: 100%; margin: 0" >
+					<div class=""  role="alert" style="margin-top:10px;">
+						<form class="row row-cols-lg-auto g-3 align-items-center" onsubmit="return false;">
+
+							<div class="col-5">
+								<label class="visually-hidden" for="inlineFormInputPostcode">Postcode</label>
+								<div class="input-group">
+								  <input type="text" name="postcode"  class="form-control" id="inlineFormInputPostcode" placeholder="Such as SE4" required="required">
+								</div>
+							</div>
+
+							<div class="col-4">
+								<label class="visually-hidden" for="inlineFormfw">date</label>
+								<select class="form-select" name="fw" id="inlineFormfw">
+								  <option value="fw24h" selected="selected" title="24 hours from now">in 24h</option>
+								  <option value="fw48h" title="24 hours after 24 hours">after 24h</option>
+								</select>
+							</div>
+
+							<div class="col-2">
+								<a type='submit' class="btn" id="submitform" style="background: var(--color-primary);color:white;">Query</a>
+							</div>
+
+
+						</form>
+						<div class="row" style="background-color:#f5f5f5;border-color:#ddd;" id="besttime"></div>
+
+					</div>
+
+					<div id="tbody-search" style="height: 500px; margin: 0">
+
+					</div>
+				</div>
+
+				<div class="carbonshow" style="height: 100%; margin: 0" >
+					<div id="tbody-factor" style="width:100%;height: 500px;"> </div>
+				</div>
+
+			</div>
+
+			<!-- Tab panes -->
+			<div class="tab-content" id="myTabContent">
+
+			</div>
+		</div>
+    </div>
+
+</section>
+
+
+<script>
+	var base = 'https://api.carbonintensity.org.uk';
+
+    var regioname_geoname_rels = {
+        "North East England":{'regid':4,'geoname':'North East','showname':'North East'},
+        "North West England":{'regid':3,'geoname':'North West','showname':'North West'},
+        "Yorkshire":{'regid':5,'geoname':'Yorkshire and the Humber','showname':'Yorkshire and the Humber'},
+        "East Midlands":{'regid':9,'geoname':'East Midlands','showname':'East Midlands'},
+        "West Midlands":{'regid':8,'geoname':'West Midlands','showname':'West Midlands'},
+        "East England":{'regid':10,'geoname':'East','showname':'East'},
+        "London":{'regid':13,'geoname':'London','showname':'London'},
+        "South East England":{'regid':14,'geoname':'South East','showname':'South East'},
+        "South West England":{'regid':11,'geoname':'South West','showname':'South West'},
+        "North Wales & Merseyside":{'regid':6,'geoname':'Northern Ireland','showname':'Northern Ireland'},
+        "Scotland":{'regid':16,'geoname':'Scotland','showname':'Scotland'},
+        "Wales":{'regid':17,'geoname':'Wales','showname':'Wales'},
+    };
+
+	//The actual data that is finally put into the map is retrieved in getJSON in the form
+	var mapdatarr = [];
+	//The mapping relationship between the place names in the map file and the place names displayed on the page, there is a function to initialize this variable later
+    var namemaparr = {};
+	//The id of the div where the map is in the page
+	var mapdom = document.getElementById('tbody-map');
+	//graphics initialization
+	var mapChart = echarts.init(mapdom, null, {
+		  renderer: 'canvas',
+		  useDirtyRect: false
+		});
+	mapChart.showLoading();
+
+
+
+	/************** Line chart variable definitionset************************************************************/
+
+	var hasStack = false;
+
+	var stack_tmp_data = {};
+
+	var stack_series_data = new Array();
+
+	var stack_xdata = new Array();
+
+	var statck_showtype = 1;
+
+	var besttime = '';
+
+
+
+
+	/************** Pie chart variable definition set************************************************************/
+	/*
+	Use this variable, plus if(pos ==1) in the click event of btntab below. Solve the problem that the two echarts cannot be fully displayed. That is to say, one of the graphs needs to be clicked in real time to be displayed. If the data of the two graphs is directly fetched and rendered when the webpage is opened, one of them will be incomplete or not displayed at all when switching tabs. The resize of echart does not work
+	*/
+	var hasFactor = false;
+
+	var pieDom = document.getElementById('tbody-factor');
+	var pieChart = null;
+
+	//Page initialization, first render the first map. The second Factor needs to fetch data and render it when it is clicked for the first time, otherwise there will be an abnormal display. I did not find a way to render the three tabs directly when the page is initialized and display them completely, so I had to work around it
+	$(function(){
+		//Set the mapping relationship of the name of the map
+		setNamemap();
+
+		//The three tabs only display the first one, which is the map
+		$(".carbonshow").hide();
+		$(".carbonshow").eq(0).show();
+		//$("input[name=postcode]").val('RG10');search(); $(".carbonshow").eq(0).show();
+		doMap();
+
+        //Search-tab init
+		//https://www.runoob.com/jquery/ajax-getjson.html
+		//$.getJSON(base + '/intensity/fw24h', function(result) {
+            //doCarbon(result, "#tbody-search");
+        //});
+
+	});
+
+
+	/******************************************** Various click event processing areas *********************************************/
+	$("input[name=postcode]").keydown(function(event) {
+		if(event.keyCode == 13) {
+			search();
+		}
+	});
+
+	$("#submitform").click(function(){
+		search();
+	});
+
+
+	//btntab init/click
+	$(".btntab").click(function(){
+		var pos = $(this).index();
+
+		$(".btntab").removeClass('btn-outline-primary').addClass('btn-outline-secondary');
+		$(this).removeClass('btn-outline-secondary').addClass('btn-outline-primary');
+
+		$(".carbonshow").hide();
+		$(".carbonshow").eq(pos).show();
+
+		//Work around the problem that two echarts display abnormalities at the same time
+		if($(this).text() == 'Factor') {
+			doFactor();
+		}
+
+	});
+
+
+	/******************************************** function *********************************************/
+
+	function initStackData()
+	{
+		$("#besttime").html("");
+		stack_series_data = new Array();
+		stack_xdata = new Array();
+		stack_tmp_data = {};
+
+		if(2 == statck_showtype){
+			initStackTmpdata2();
+		}
+		else{
+			initStackTmpdata();
+		}
+	}
+
+
+	function initStackTmpdata()
+	{
+		var factors = ['biomass', 'coal', 'imports', 'gas', 'nuclear', 'other', 'hydro', 'solar', 'wind'];
+		for (var i in factors) {
+			stack_tmp_data[factors[i]] = {
+				type: 'bar',
+				data: [],
+				coordinateSystem: 'polar',
+				name: factors[i],
+				stack: 'a',
+				emphasis: {
+					focus: 'series'
+				}
+			};
+		}
+	}
+
+
+	function initStackTmpdata2()
+	{
+		var factors = ['biomass', 'coal', 'imports', 'gas', 'nuclear', 'other', 'hydro', 'solar', 'wind'];
+		for (var i in factors) {
+			stack_tmp_data[factors[i]] = {
+				name: factors[i],
+				type: 'bar',
+				stack: 'total',
+				label: {
+					show: true
+				},
+				barWidth: '30%',
+				emphasis: {
+					focus: 'series'
+				},
+				data: []
+			};
+		}
+	}
+
+
+	//Factor-tab
+	function doFactor()
+	{
+		if(hasFactor) return;
+
+		pieChart = echarts.init(pieDom, null, {
+		  renderer: 'canvas',
+		  useDirtyRect: false
+		});
+		pieChart.showLoading();
+
+
+		//$("#tbody-factor").text("");
+
+		$.getJSON(base + '/intensity/factors', function(result) {
+			pieChart.hideLoading();
+
+			var carbonarr = [];
+			for( var k in result.data[0]){
+				var arr = {};
+				arr.value = result.data[0][k];
+				arr.name = k;
+				carbonarr.push(arr);
+			}
+			showPie(carbonarr);
+
+			hasFactor = true;
+		});
+	}
+
+
+
+	//map-tab
+	function doMap()
+	{
+		/*
+		for( var i in regions) {
+			$.getJSON(base + '/regional/regionid/' + regions[i], function(result) {
+				var arr = {};
+				arr.value = result.data[0]['data'][0]['intensity']['forecast'];
+				arr.name = result.data[0]['shortname'];
+				mapdatarr.push(arr);
+			});
+		}
+		*/
+		let promiseArr = [];
+		for( var i in regioname_geoname_rels) {
+			let p = new Promise((resolve, reject) => {
+				$.getJSON(base + '/regional/regionid/' + regioname_geoname_rels[i]['regid'], function(result) {
+					var arr = {};
+                    console.log(result.data[0]['regionid']);
+					arr.value = result.data[0]['data'][0]['intensity']['forecast'];
+					arr.name = regioname_geoname_rels[result.data[0]['shortname']]['showname'];
+					mapdatarr.push(arr);
+				});
+
+				//Promise.then() need this line .https://segmentfault.com/q/1010000010058928
+				resolve(1);
+			});
+			promiseArr.push(p);
+		}
+
+		setTimeout("showmap()", 2000);
+
+		Promise.all(promiseArr).then(res => {
+			var aaaa  = 0;
+			//console.log(mapdatarr);
+			//https://stackoverflow.com/questions/22416073/when-and-done-using-an-array-with-done
+			//https://stackoverflow.com/questions/36405827/using-jquery-when-with-array-of-promises
+			// it dosenot work, use setTimeout instead? //https://www.jianshu.com/p/d14e2331b7cb
+			//showmap();
+		});
+	}
+
+
+	function doStack(data, aft24h, stackChart)
+	{
+
+		if(0 === statck_showtype){
+			//only list
+			$('#tbody-search').css("height", "100%");
+			showTable(data, '#tbody-search', aft24h);
+		}
+		else if(1 == statck_showtype) {
+
+			getStackData1(data, aft24h);
+			showStack1(stackChart);
+		}
+		else if(2 == statck_showtype) {
+			//factor
+			getStackData2(data, aft24h);
+			showStack2(stackChart);
+		}
+		else{
+			//pie
+			getStackData2(data, aft24h);
+			showStack3(stackChart);
+		}
+
+
+
+
+	}
+
+
+	//search form
+	function search()
+	{
+		if(hasStack) return;
+
+		initStackData();
+
+		$("#tbody-search").html('').attr("style","height: 500px;").attr("_echarts_instance_","");
+		var stackdom = document.getElementById('tbody-search');
+		var stackChart = null;
+
+		stackChart = echarts.init(stackdom, null, {
+		  renderer: 'canvas',
+		  useDirtyRect: false
+		});
+		stackChart.showLoading();
+
+
+		var postcode = $("input[name=postcode]").val();
+		var fw = $("select[name=fw]").val();
+		//var regionid = $("select[name=regionid]").val();
+		var curtime = new Date().toISOString();
+
+		if(!postcode) {
+			alert("postcode is null !")
+			return ;
+		}
+
+		var suburl = "/regional/intensity/"+ curtime +"/"+fw+"/postcode/" + postcode;
+
+		$.getJSON(base+suburl, function(result) {
+			stackChart.hideLoading();
+			var aft24h = (fw == 'fw48h') ? true : false;
+			doStack(result['data'], aft24h, stackChart);
+		});
+	}
+
+	function showPie(carbondata)
+	{
+		var option = {
+		  color: [
+			    '#dd6b66',
+				'#759aa0',
+				'#e69d87',
+				'#c23531',
+				'#2f4554',
+				'#61a0a8',
+				'#d48265',
+				'#91c7ae',
+				'#749f83',
+				'#ca8622',
+				'#bda29a',
+				'#6e7074',
+				'#546570',
+				'#c4ccd3'
+		  ],
+		title: {
+			text: 'Pie chart',
+			subtext: 'subtitle',
+			left: 'center'
+		  },
+		  tooltip: {
+			trigger: 'item'
+		  },
+		  legend: {
+			orient: 'vertical',
+			left: 'left'
+		  },
+		  series: [
+			{
+				name: 'factor title',
+				type: 'pie',
+				radius: '50%',
+				data: carbondata,
+
+				emphasis: {
+					itemStyle: {
+						shadowBlur: 10,
+						shadowOffsetX: 0,
+						shadowColor: 'rgba(0, 0, 0, 0.5)'
+					}
+				}
+			}
+		  ]
+		};
+
+		if (option && typeof option === 'object') {
+		  pieChart.setOption(option);
+		}
+
+		window.addEventListener('resize',()=> {
+			pieChart.resize();
+			//https://blog.csdn.net/MrHXZ/article/details/121359586
+			//echarts.init(document.getElementById('tbody-map')).resize();
+		});
+	}
+
+
+	//https://echarts.apache.org/examples/zh/index.html#chart-type-map
+	function showmap()
+	{
+
+		var mapoption;
+		//https://www.kaggle.com/datasets/dorianlazar/uk-regions-geojson?resource=download
+		$.get('http://39.104.58.244/wyg/uk.json', function (geoJson) {
+			mapChart.hideLoading();
+			echarts.registerMap('UK', geoJson);
+			mapoption = {
+			  title: {
+				text: 'UK Regions',
+				subtext: 'Data from Carbon',
+				sublink:
+				  'http://localhost/'
+			  },
+			  tooltip: {
+				trigger: 'item',
+				formatter: '{b}<br/>{c}'
+			  },
+			  toolbox: {
+				show: true,
+				orient: 'vertical',
+				left: 'right',
+				top: 'center',
+				feature: {
+				  dataView: { readOnly: false },
+				  restore: {},
+				  saveAsImage: {}
+				}
+			  },
+			  visualMap: {
+				min: 100,
+				max: 400,
+				text: ['High', 'Low'],
+				realtime: false,
+				calculable: true,
+				inRange: {
+				  color: ['lightskyblue', 'yellow', 'orangered']
+				}
+			  },
+			  series: [
+				{
+				  name: 'UK CARBON',
+				  type: 'map',
+				  map: 'UK',
+				  label: {
+					show: true
+				  },
+				  data: mapdatarr,
+                  nameMap: namemaparr
+				}
+			  ]
+			};
+
+			mapChart.setOption(mapoption);
+		});
+
+		window.addEventListener('resize', ()=> {
+			mapChart.resize();
+			//https://blog.csdn.net/MrHXZ/article/details/121359586
+			//echarts.init(document.getElementById('tbody-factor')).resize();
+		});
+	}
+
+	function showStack1(stackChart)
+	{
+
+		var series_data = new Array();
+		var series_index = new Array();
+
+		for(var i in stack_series_data) {
+			series_data.push(stack_series_data[i].forecast);
+			series_index.push(stack_series_data[i].index);
+		}
+
+		var option_stack = {
+			tooltip: {
+				trigger: 'axis',
+				axisPointer: {
+				  // Use axis to trigger tooltip
+				  type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+				}
+			},
+			xAxis: {
+				type: 'category',
+				data: stack_xdata
+			},
+		  yAxis: {
+			type: 'value',
+			},
+
+
+		  visualMap: {
+			orient: 'horizontal',
+			left: 'center',
+			min: 100,
+			max: 350,
+			realtime: false,
+			calculable: true,
+			text: ['High Index', 'Low Index'],
+			inRange: {color: ['green', 'yellow', 'red']}
+		  },
+
+		  series: [
+			{
+				barWidth: '25%',
+				type: 'bar',
+				label: {
+					show: false,
+					position: 'top'
+				},
+				data: series_data,
+				/*
+				itemStyle: {
+					normal: {
+						color: function(params) {
+							var colorlists = {'very high':'#FF0000', 'high':'#FF0000', 'moderate':'#FFA500', 'low':'#00FF00', 'very low':'#00FF00'};
+							return colorlists[series_index[params.dataIndex]];
+						}
+					}
+				}
+				*/
+			}
+		  ]
+		};
+
+		if (option_stack && typeof option_stack === 'object') {
+		  stackChart.setOption(option_stack);
+		}
+		window.addEventListener('resize', stackChart.resize);
+
+	}
+
+	//https://echarts.apache.org/examples/zh/editor.html?c=bar-y-category-stack
+	function showStack2(stackChart)
+	{
+		var option_stack;
+
+		option_stack = {
+			tooltip: {
+				trigger: 'axis',
+				axisPointer: {
+				  // Use axis to trigger tooltip
+				  type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+				}
+			},
+			legend: {},
+			grid: {
+				left: '1%',
+				right: '1%',
+				bottom: '3%',
+				containLabel: true
+			},
+			yAxis: {
+				type: 'value'
+			},
+			xAxis: {
+				type: 'category',
+				data: stack_xdata
+			},
+			series: stack_series_data
+		};
+
+		if (option_stack && typeof option_stack === 'object') {
+		  stackChart.setOption(option_stack);
+		}
+
+		window.addEventListener('resize', stackChart.resize);
+	}
+
+
+
+	//https://echarts.apache.org/examples/zh/editor.html?c=bar-polar-stack-radial
+	function showStack3(stackChart)
+	{
+
+		var option_stack	= {
+		    tooltip: {
+				trigger: 'axis',
+				axisPointer: {
+				  // Use axis to trigger tooltip
+				  type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+				}
+			},
+			angleAxis: {
+				type: 'category',
+				data: stack_xdata
+			},
+			radiusAxis: {},
+			polar: {},
+			series: stack_series_data,
+			legend: {
+				show: true,
+				data: ['biomass', 'coal', 'imports', 'gas', 'nuclear', 'other', 'hydro', 'solar', 'wind']
+			}
+		};
+
+		if (option_stack && typeof option_stack === 'object') {
+		  stackChart.setOption(option_stack);
+		}
+
+		stackChart.on('mouseover', 'series.bar', function(params) {
+			console.log(params);
+			option_stack.series[params.seriesIndex].label = {show: true};
+		    stackChart.setOption(option_stack);
+		});
+		stackChart.on('mouseout', 'series.bar', function(params) {
+			console.log(params);
+			option_stack.series[params.seriesIndex].label = {show: false};
+		    stackChart.setOption(option_stack);
+		});
+
+		window.addEventListener('resize', stackChart.resize);
+	}
+
+
+	//Line chart data assignment
+	function getStackData1(result, after24h)
+	{
+
+		var tmparr = {};
+		var i = 0;
+
+		$.each(result.data, function(i, one) {
+			var fromtime = one.from.replace("T", ' ').replace("Z", ' ').substring(10).trim();
+			var totime = one.to.replace("T", ' ').replace("Z", ' ').substring(10).trim();
+
+			if(i < 48){
+				tmparr[fromtime+ "-" + totime] = one.intensity.forecast;
+			}
+
+			if(after24h && (i++ < 48)){
+				return;
+			}
+
+
+
+			stack_series_data.push(one.intensity);
+
+			stack_xdata.push(fromtime);
+		});
+
+		calcBesttime(tmparr);
+	}
+
+
+	//Line chart data assignment
+	function getStackData2(result, after24h)
+	{
+		var tmparr = {};
+		var i = 0;
+
+
+		$.each(result.data, function(i, one) {
+			var fromtime = one.from.replace("T", ' ').replace("Z", ' ').substring(10).trim();
+			var totime = one.to.replace("T", ' ').replace("Z", ' ').substring(10).trim();
+
+			if(i < 48){
+				tmparr[fromtime+ "-" + totime] = one.intensity.forecast;
+			}
+
+			if(after24h && (i++ < 48)){
+				return;
+			}
+
+			for( var j in one.generationmix) {
+				var fuelkv = one.generationmix[j];
+				stack_tmp_data[fuelkv['fuel']]['data'].push((one.intensity.forecast * fuelkv['perc'] / 100).toFixed(1));
+			}
+
+			var fromtime = one.from.replace("T", ' ').replace("Z", ' ').substring(10).trim();
+
+
+			if((null == stack_xdata) || (-1 == stack_xdata.indexOf(fromtime))) {
+				stack_xdata.push(fromtime);
+			}
+		});
+
+		for(var i in stack_tmp_data) {
+			stack_series_data.push(stack_tmp_data[i]);
+		}
+
+		calcBesttime(tmparr);
+	}
+
+
+	//html append
+	function showTable(result, divid, after24h)
+	{
+
+		var buf='';
+		var i = 0;
+
+		$(divid).html('');
+
+		var buf = '<table class="table" style="color:var(--color-secondary-light);"><thead><tr><th>Tips</th><th>from</th><th>to</th><th>forecast</th><th>index</th></tr></thead><tbody>';
+
+		// https://www.runoob.com/jquery/misc_each.html
+		$.each(result.data, function(i, one) {
+			if(after24h && (i++ < 48)){
+				return;
+			}
+
+			//var one = data.data[i];
+			var tmp = '<tr>';
+
+			tmp += "<td>" + getwords(one.intensity.index) + "</td>";
+
+
+			tmp += "<td>" + one.from.replace("T", ' ').replace("Z", ' ') + "</td>";
+			tmp += "<td>" + one.to.replace("T", ' ').replace("Z", ' ').substring(10) + "</td>";
+
+			tmp += "<td>" + one.intensity.forecast + "</td>";
+			//tmp += "<td>" + one.intensity.actual + "</td>";
+			tmp += "<td>" + one.intensity.index + "</td>";
+			tmp += '</tr>';
+
+			//Here only append to the total buffer, do not append to the page, and append again at the end, the page rendering speed is faster.
+			buf += tmp;
+		});
+		buf += '</tbody></table>';
+
+		$(divid).append(buf);
+	}
+
+	function calcBesttime(arr)
+	{
+		var btimearr = [];
+		//var lowvals = Object.values(arr).sort((a,b)=>{return a-b;});
+		var lowvals = Object.values(arr).sort((a,b)=>{return a-b;});
+		for( var i in lowvals) {
+			for( var k in arr) {
+				if(arr[k] == lowvals[i]) {
+					btimearr.push(k);
+				}
+				if(btimearr.length == 6) break;
+			}
+			if(btimearr.length == 6) break;
+		}
+
+		btimearr.sort();
+
+		$("#besttime").html("<medium>Recommended best charging time for the next three hours：<br>" + btimearr.join("<br>") + "</medium");
+	}
+
+
+	//When the carbon content shows high, return the prompt: currently it is not recommended to use electricity. When the carbon content shows moderate, return the prompt: electricity can be used, but not the best time. When the carbon content shows low, return the prompt: the current time period is the best time to use electricity.
+	function getwords(cval)
+	{
+
+		if(cval.includes('high')) {
+			return '<span class="text-danger">Not recommend</span>';
+		}
+		else if(cval == 'moderate') {
+			return '<span class="text-dark">Recommend</span>';
+		}
+		else if(cval.includes('low')) {
+			return '<span class="text-success">Best recommend</span>';
+		}
+		else {
+			return '';
+		}
+	}
+
+
+    function setNamemap()
+    {
+        for ( var i in regioname_geoname_rels) {
+            var tmp = regioname_geoname_rels[i];
+            namemaparr[tmp['geoname']] = tmp['showname'];
+        }
+    }
+
+</script>
+
+         <!-- ======= End API Section ======= -->
+
+
+
+
+
+
+
+
+    <!-- ======= Research Section ======= -->
+    <section id="portfolio" class="portfolio" data-aos="fade-up">
+
+      <div class="container">
+
+        <div class="section-header">
+          <h2>Research</h2>
+          <p>Nowadays, many people express their opinions on Twitter, especially those who are particularly concerned about climate change. They represent a specific large group, expressing their voices, views on natural climate change, and ideas for improving its negative outcomes.</p>
+        </div>
+
+        <img src="assets/img/ClimateWordcloud.jpg" style="display: block;margin: 0 auto;height:400px;weight:400px;"/>
+         &nbsp
+         &nbsp
+        <dl>
+          <dt>Background</dt>
+          <dd>
+            <p>As carbon emissions increase, the climate is impacted in several ways. The most significant impact is global warming, which occurs when the increasing levels of carbon dioxide and other greenhouse gases in the atmosphere trap more heat from the sun, causing the Earth's temperature to rise. </p>
+            <p>This rise in temperature leads to a range of climate changes, including:
+            More extreme weather events such as heatwaves, droughts, floods, and hurricanes.
+            Rising sea levels due to the melting of glaciers and ice sheets, which can lead to coastal flooding and erosion.
+            Changes in precipitation patterns, which can impact agriculture and water resources.
+            Loss of biodiversity, as species are unable to adapt to the changing climate.</p>
+            &nbsp
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/HK8LLWSIIm4" style="display: block;margin: 0 auto;" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            &nbsp
+            &nbsp
+            <p>These climate changes will have a significant impact on our lives. For example:</p>
+        <ul>
+           <li>Health: Extreme weather events can lead to health impacts such as heat stroke, respiratory problems, and waterborne diseases.</li>
+           &nbsp
+           <li>Agriculture: Changes in precipitation patterns and temperature can lead to decreased crop yields and food shortages.</li>
+           &nbsp
+           <li>Water resources: Changing precipitation patterns can lead to water scarcity and competition for resources.</li>
+           &nbsp
+           <li>Economy: Extreme weather events can lead to damage to infrastructure and property, which can have a significant economic impact.</li>
+         </ul>
+            <p>In summary, as carbon emissions increase, the climate will continue to change in ways that will have a profound impact on our lives, health, and economy. It is important to take action to reduce emissions and mitigate the impacts of climate change.
+            <p>
+              <iframe title="GHG emissions from electricity generation in the United Kingdom 2010-2021" aria-label="Interactive area chart" id="datawrapper-chart-6pRLa" src="https://datawrapper.dwcdn.net/6pRLa/1/" scrolling="no" frameborder="0" style="display: block;margin: 0 auto;width: 0; min-width: 60% !important; border: none;" height="600" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+              </script>
+            </p>
+            </p>
+          </dd>
+          &nbsp
+          &nbsp
+          <dt>Interview</dt>
+          <dd>
+            <p>I found 10 participants for webpage function testing and interviewed them about their views on carbon emissions and climate change.</p>
+
+              <span class="image left"><img src="assets/img/Test.jpeg" style="display: block;margin: 0 auto;height:400px;weight:400px;" /></span>
+              &nbsp
+              &nbsp
+            <p>Among them, 3 did not have much knowledge about carbon emissions and were not aware of the impact of climate change on their lives. 2 had read related news and knew that carbon emissions could affect the climate, leading to poor air quality that could impact human life. 5 had a clear understanding of how climate change affects human life and even the entire society, and they were paying attention to information on carbon emissions. They believed that taking personal action could reduce carbon emissions to some extent and alleviate the severe problems caused by climate change.
+             <p>
+              <iframe title="Views on Carbon Emissions and Climate Change" aria-label="Pie Chart" id="datawrapper-chart-m9Y6X" src="https://datawrapper.dwcdn.net/m9Y6X/1/" scrolling="no" frameborder="0" style="display: block;margin: 0 auto;width: 0; min-width: 30% !important; border: none;" height="200" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+              </script>
+            </p>
+            </p>
+
+
+            &nbsp
+          </dd>
+          <dt>Function Test</dt>
+          <dd>
+            <p>Regarding the usefulness of the website's functions, I have fixed 3 versions.</p>
+            <p><ul>
+             <li>The webpage performance was slow, so I optimized the response time.</li>
+             &nbsp
+             <span class="image left"><img src="assets/img/Loading.jpg" style="display: block;margin: 0 auto;height:200px;weight:200px;" /></span>
+             &nbsp
+             &nbsp
+             <li>The Map module often returned incorrect values of NaN. After checking, I found it was due to errors in city names that could not be matched. </li>
+             &nbsp
+             <span class="image left"><img src="assets/img/NaN.jpg" style="display: block;margin: 0 auto;height:200px;weight:200px;" /></span>
+             &nbsp
+             &nbsp
+             <li>In the Search module, the search results were displayed in a list form, which was not very concise and convenient for users, so I changed it to a visual vertical bar chart.By changing colors, users could easily identify the lowest value of a certain time period.</li>
+             &nbsp
+             <span class="image left"><img src="assets/img/Virsualisation.jpg" style="display: block;margin: 0 auto;height:200px;weight:200px;" /></span>
+             &nbsp
+             &nbsp
+              <li>In the Factor module, there were repeated colors in several parts of the original pie chart. To better distinguish them, I adjusted them to different colors, without repetition.</li>
+              &nbsp
+              <span class="image left"><img src="assets/img/RepeatColor.jpg" style="display: block;margin: 0 auto;height:200px;weight:200px;" /></span>
+              &nbsp
+              &nbsp
+             </ul></p>
+          </dd>
+          <span class="image fit"><img src="images/Charger.jpg" alt="" /></span>
+        </dl>
+      </div>
+
+    </section><!-- End Portfolio Section -->
+
+
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="footer-legal text-center">
+      <div class="container d-flex flex-column flex-lg-row justify-content-center justify-content-lg-between align-items-center">
+
+        <div class="d-flex flex-column align-items-center align-items-lg-start">
+          <div class="copyright">
+            &copy; Copyright <strong><span>Goldsmiths</span></strong>. All Rights Reserved
+          </div>
+          <div class="credits">
+            Designed by <a href="mailto:xtang001@gold.ac.uk">TxxMade</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer><!-- End Footer -->
+
+  <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
